@@ -1,0 +1,12 @@
+E:\dev\GO\storage\src\main\java\com\example\services\UploadService.java
+E:\dev\GO\storage\src\main\java\com\example\config\CorsConfig.java
+E:\dev\GO\storage\src\main\java\com\example\controllers\UploadController.java
+E:\dev\GO\storage\src\main\java\com\example\services\ControllerUtils.java
+E:\dev\GO\storage\src\main\java\com\example\controllers\DownloadController.java
+E:\dev\GO\storage\src\main\java\com\example\services\DownloadService.java
+E:\dev\GO\storage\src\main\java\com\example\services\S3Service.java
+E:\dev\GO\storage\src\main\java\com\example\config\KafkaConfig.java
+E:\dev\GO\storage\src\main\java\com\example\config\S3Config.java
+E:\dev\GO\storage\src\main\java\com\example\kafka\OcrListener.java
+E:\dev\GO\storage\src\main\java\com\example\kafka\OcrProducer.java
+E:\dev\GO\storage\src\main\java\com\example\Main.java

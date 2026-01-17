@@ -1,0 +1,4 @@
+2. PR, wielostrony sie dziwnie zachowuja, sa dodawane jakies puste wiersze zwykle na wysokosci 8 pozycji na stronie
+
+
+5*. Przebudowac wszystko na bardziej uniwersalne
