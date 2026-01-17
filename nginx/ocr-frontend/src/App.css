@@ -1,0 +1,104 @@
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background: #121212;
+  color: #eee;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  background: #1e1e1e;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+label,
+button {
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 5px;
+}
+
+label {
+  background: #4caf50;
+  color: white;
+}
+
+button {
+  background: #2196f3;
+  color: white;
+  border: none;
+}
+
+button:hover {
+  background: #1976d2;
+}
+
+#filename {
+  margin-top: 10px;
+  color: #aaa;
+}
+
+#status {
+  margin-top: 20px;
+  color: #bbb;
+}
+
+.margin-box {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.margin-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.margin-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.margin-controls input[type="range"] {
+  flex: 1;
+  accent-color: #4caf50;
+}
+
+.margin-value {
+  display: flex;
+  align-items: center;
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.margin-value input {
+  width: 50px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  text-align: right;
+  outline: none;
+}
+
+.margin-value span {
+  margin-left: 4px;
+  color: #aaa;
+}
