@@ -13,8 +13,8 @@ import java.util.List;
 
 public class Company5OCR extends BaseOCR<Company5Row> {
 
-    private final int startYpos = 350;
-    private final int bottomGraySpaceColor = -4144960;
+    private static final int startYpos = 350;
+    private static final int bottomGraySpaceColor = -4144960;
 
     private final Integer[] colsXPos = {
             29,
@@ -63,20 +63,20 @@ public class Company5OCR extends BaseOCR<Company5Row> {
     @Override
     public List<Company5Row> getRows(PDDocument document, int pageIndex) throws IOException {
 
-        log.info("Procesuje strone : " + pageIndex);
+        log.info("Procesuje strone :{}", pageIndex);
 
         PDPage page = document.getPage(pageIndex);
         PDFRenderer renderer = new PDFRenderer(document);
         BufferedImage img = renderer.renderImageWithDPI(pageIndex, 72);
 
-        List<Integer> Y = calcY(img);
-        log.info("Znaleziono pozycje Y : " + Y);
+        List<Integer> rowYpos = calcY(img);
+        log.info("Znaleziono pozycje rowYpos :{}", rowYpos);
 
         List<List<String>> regionNames = new ArrayList<>();
-        for (int y = 0; y < Y.size() - 1; y++) {
+        for (int y = 0; y < rowYpos.size() - 1; y++) {
             List<String> regionRowNames = new ArrayList<>();
-            int yPos = Y.get(y);
-            int h = Y.get(y + 1) - Y.get(y);
+            int yPos = rowYpos.get(y);
+            int h = rowYpos.get(y + 1) - rowYpos.get(y);
 
             for (int x = 0; x < colsXPos.length - 1; x++) {
                 String regionName = y + "-" + x;
@@ -130,13 +130,13 @@ public class Company5OCR extends BaseOCR<Company5Row> {
 
         boolean sameChar = false;
         List<Integer> packList = new ArrayList<>();
-        List<Integer> Y = new ArrayList<>();
+        List<Integer> rowYpos = new ArrayList<>();
         for (int y = startYpos; y < img.getHeight(); y++) {
             for(int width = 0; width < 10; width++){
                 int rgb = img.getRGB(colsXPos[0] + width, y);
                 packList.add(rgb);
                 if(rgb != -1 && !sameChar){
-                    Y.add(y);
+                    rowYpos.add(y);
                     sameChar = true;
                 }
             }
@@ -149,7 +149,7 @@ public class Company5OCR extends BaseOCR<Company5Row> {
             packList.clear();
             }
 
-        return Y;
+        return rowYpos;
     }
 
 }

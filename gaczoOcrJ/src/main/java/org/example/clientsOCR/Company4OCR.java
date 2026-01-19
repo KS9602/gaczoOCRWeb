@@ -14,9 +14,9 @@ import java.util.List;
 
 public class Company4OCR extends BaseOCR<Company4Row>{
 
-    private final int firstLineColor = -11184811;
-    private final int secondLineColor = -8355712;
-    private final int thirdLineColor = -12237499;
+    private static final int firstLineColor = -11184811;
+    private static final int secondLineColor = -8355712;
+    private static final int thirdLineColor = -12237499;
 
     private final Integer[] colsXPos = {
             39,
@@ -65,7 +65,7 @@ public class Company4OCR extends BaseOCR<Company4Row>{
     @Override
     public List<Company4Row> getRows(PDDocument document, int pageIndex) throws IOException {
 
-        log.info("Procesuje strone : " + pageIndex);
+        log.info("Procesuje strone :{}", pageIndex);
         PDPage page = document.getPage(pageIndex);
         PDFRenderer renderer = new PDFRenderer(document);
         BufferedImage img = renderer.renderImageWithDPI(pageIndex, 72);
@@ -79,14 +79,14 @@ public class Company4OCR extends BaseOCR<Company4Row>{
         if (lpY == 0){
             return List.of();
         }
-        List<Integer> Y = calcY(img, lpY);
-        log.info("Znaleziono pozycje Y : " + Y);
+        List<Integer> rowYpos = calcY(img, lpY);
+        log.info("Znaleziono pozycje rowYpos :{}", rowYpos);
 
         List<List<String>> regionNames = new ArrayList<>();
-        for(int y = 0; y < Y.size() -1; y++){
+        for(int y = 0; y < rowYpos.size() -1; y++){
             List<String> regionRowNames = new ArrayList<>();
-            int yPos = Y.get(y);
-            int h    = Y.get(y + 1) - Y.get(y);
+            int yPos = rowYpos.get(y);
+            int h    = rowYpos.get(y + 1) - rowYpos.get(y);
 
             for (int x = 0; x < colsXPos.length - 1; x++){
                 String regionName = y + "-" + x;
@@ -136,7 +136,7 @@ public class Company4OCR extends BaseOCR<Company4Row>{
 
     private List<Integer> calcY(BufferedImage img, int lpY){
 
-        List<Integer> Y = new ArrayList<>();
+        List<Integer> rowYpos = new ArrayList<>();
         for (int y = lpY; y < img.getHeight(); y++){
             int rgb = img.getRGB(colsXPos[0],y);
             boolean rowLine = switch (rgb) {
@@ -146,10 +146,10 @@ public class Company4OCR extends BaseOCR<Company4Row>{
                 default -> false;
             };
             if(rowLine){
-                Y.add(y);
+                rowYpos.add(y);
             }
         }
-        return Y;
+        return rowYpos;
     }
 
 

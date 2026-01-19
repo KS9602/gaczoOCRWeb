@@ -20,28 +20,27 @@ import java.util.regex.Pattern;
 public class Company2OCR extends BaseOCR<Company2Row> {
 
 
-    private final int tableYStart = 284;
-    private final int lPXStart = 16;
-    private final int lPXend = 23;
+    private static final int lPXStart = 16;
+    private static final int lPXend = 23;
 
-    private final int smallRowHeight = 12;
+    private static final int smallRowHeight = 12;
 
-    private final int nameXStart = 32;
-    private final int nameXEnd = 340;
-    private final int quantityXStart = 378;
-    private final int quantityXEnd = 401;
-    private final int quantityUnitXStart = 405;
-    private final int quantityUnitXEnd = 415;
-    private final int unitPriceNettoXStart = 455;
-    private final int unitPriceNettoXEnd = 484;
-    private final int nettoValueXStart = 520;
-    private final int nettoValueXEnds = 545;
-    private final int vatXStart = 553;
-    private final int vatXend = 563;
+    private static final int nameXStart = 32;
+    private static final int nameXEnd = 340;
+    private static final int quantityXStart = 378;
+    private static final int quantityXEnd = 401;
+    private static final int quantityUnitXStart = 405;
+    private static final int quantityUnitXEnd = 415;
+    private static final int unitPriceNettoXStart = 455;
+    private static final int unitPriceNettoXEnd = 484;
+    private static final int nettoValueXStart = 520;
+    private static final int nettoValueXEnds = 545;
+    private static final int vatXStart = 553;
+    private static final int vatXend = 563;
 
-    private final int endOfBlackLine = 573;
-    private final int blackLine = -4210753;
-    private final int noneRowLinesEnd = 1;
+    private static final int endOfBlackLine = 573;
+    private static final int blackLine = -4210753;
+    private static final int noneRowLinesEnd = 1;
 
 
 
@@ -73,19 +72,19 @@ public class Company2OCR extends BaseOCR<Company2Row> {
     @Override
     public List<Company2Row> getRows(PDDocument document, int pageIndex) throws IOException {
 
-        log.info("Procesuje strone : " + pageIndex);
+        log.info("Procesuje strone :{}", pageIndex);
         PDPage page = document.getPage(pageIndex);
         if(!isRow(document, pageIndex)){
-            log.info("Strona bez tabeli, przerywam dzialanie: " + pageIndex);
+            log.info("Strona bez tabeli, przerywam dzialanie:{}", pageIndex);
             return List.of();
         }
 
-        List<Integer> Y = findBlackLines(document, pageIndex);
-        log.info("Znaleziono pozycje Y : " + Y);
+        List<Integer> rowYpos = findBlackLines(document, pageIndex);
+        log.info("Znaleziono pozycje Y :{}",rowYpos);
 
         List<List<String>> regionNames = new ArrayList<>();
-        for(int i = 0; i < Y.size(); i++){
-            int y = Y.get(i);
+        for(int i = 0; i < rowYpos.size(); i++){
+            int y = rowYpos.get(i);
             String name = buildNameRegion2(y, nameXStart, smallRowHeight, nameXEnd);
             String lp = buildCommonRegion2(y, "LP", lPXStart, lPXend, smallRowHeight);
             String quantity = buildCommonRegion2(y, "QUANTITY", quantityXStart, quantityXEnd, smallRowHeight);
@@ -147,7 +146,7 @@ public class Company2OCR extends BaseOCR<Company2Row> {
     private List<Integer> findBlackLines(PDDocument document, int pageIndex) throws IOException {
         PDFRenderer renderer = new PDFRenderer(document);
         BufferedImage img = renderer.renderImageWithDPI(pageIndex, 72);
-        List<Integer> Y = new ArrayList<>();
+        List<Integer> rowYpos = new ArrayList<>();
         int noneRowLinesStart = pageIndex == 0 ? 4 : 1;
 
         for (int y = 0; y < img.getHeight(); y++){
@@ -155,13 +154,13 @@ public class Company2OCR extends BaseOCR<Company2Row> {
             if(rgbY == blackLine){
                 int middleRGB = img.getRGB(img.getWidth() / 2, y);
                 if(middleRGB == blackLine){
-                    Y.add(y);
+                    rowYpos.add(y);
                 }
             }
         }
-        Y.subList(0, noneRowLinesStart).clear();
-        Y.remove(Y.size() - noneRowLinesEnd);
-        return Y;
+        rowYpos.subList(0, noneRowLinesStart).clear();
+        rowYpos.remove(rowYpos.size() - noneRowLinesEnd);
+        return rowYpos;
     }
 
 

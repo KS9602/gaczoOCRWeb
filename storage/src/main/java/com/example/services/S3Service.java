@@ -1,6 +1,7 @@
 package com.example.services;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +27,7 @@ public class S3Service {
             metadata.setContentLength(contentLength);
             amazonS3.putObject(bucketName, key, inputStream, metadata);
         } catch (Exception e) {
-            throw new RuntimeException("Error S3: " + e.getMessage(), e);
+            throw new AmazonS3Exception("Error S3: " + e.getMessage(), e);
         }
     }
 

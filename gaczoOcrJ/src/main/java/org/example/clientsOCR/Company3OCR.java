@@ -14,7 +14,7 @@ import java.util.List;
 
 public class Company3OCR extends BaseOCR<Company3Row>{
 
-    private final int lineColor = -1842205;
+    private static final int lineColor = -1842205;
 
     public Company3OCR() throws IOException {
         super();
@@ -47,7 +47,7 @@ public class Company3OCR extends BaseOCR<Company3Row>{
     @Override
     public List<Company3Row> getRows(PDDocument document, int pageIndex) throws IOException {
 
-        log.info("Procesuje strone : " + pageIndex);
+        log.info("Procesuje strone :{}", pageIndex);
 
         PDPage page = document.getPage(pageIndex);
         PDFRenderer renderer = new PDFRenderer(document);
@@ -64,23 +64,23 @@ public class Company3OCR extends BaseOCR<Company3Row>{
         }
         int lpX = (int)company3StripperStripper.lpX;
 
-        List<Integer> Y = calcY(img, lpX, lpY);
-        log.info("Znaleziono pozycje Y : " + Y);
+        List<Integer> rowYpos = calcY(img, lpX, lpY);
+        log.info("Znaleziono pozycje rowYpos :{}",rowYpos);
 
-        List<Integer> X = clacX(img, lpX, lpY);
-        log.info("Znaleziono pozycje X : " + X);
+        List<Integer> rowXpos = clacX(img, lpX, lpY);
+        log.info("Znaleziono pozycje rowXpos :{}", rowXpos);
 
 
         List<List<String>> regionNames = new ArrayList<>();
-        for (int y = 0; y < Y.size() - 1; y++){
+        for (int y = 0; y < rowYpos.size() - 1; y++){
             List<String> regionRowNames = new ArrayList<>();
-            int yPos = Y.get(y);
-            int h    = Y.get(y + 1) - Y.get(y);
+            int yPos = rowYpos.get(y);
+            int h    = rowYpos.get(y + 1) - rowYpos.get(y);
 
-            for(int x = 0; x < X.size() - 1; x++){
+            for(int x = 0; x < rowXpos.size() - 1; x++){
                 String regionName = y + "-" + x;
-                int xPos = X.get(x);
-                int w = X.get(x + 1) - X.get(x);
+                int xPos = rowXpos.get(x);
+                int w = rowXpos.get(x + 1) - rowXpos.get(x);
 
                 areaStripper.addRegion(
                         regionName,
@@ -129,47 +129,47 @@ public class Company3OCR extends BaseOCR<Company3Row>{
 
     private List<Integer> calcY(BufferedImage img,int lpX,int lpY){
 
-        List<Integer> Y = new ArrayList<>();
+        List<Integer> rowYpos = new ArrayList<>();
         boolean flag = false;
         for (int y = lpY; y < img.getHeight(); y++){
             int rgb = img.getRGB(lpX,y);
             if(rgb == -1){ flag = true;}
             if(!flag){continue;}
             if(rgb == lineColor){
-                Y.add(y);
+                rowYpos.add(y);
             }
         }
-        int bottomLineY = calcBottomLineY(img, Y);
-        Y.add(bottomLineY);
-        Y.removeIf(v -> v > bottomLineY);
+        int bottomLineY = calcBottomLineY(img, rowYpos);
+        rowYpos.add(bottomLineY);
+        rowYpos.removeIf(v -> v > bottomLineY);
 
-        return Y;
+        return rowYpos;
     }
 
     private List<Integer> clacX(BufferedImage img,int lpX,int lpY){
 
-        List<Integer> X = new ArrayList<>();
-        X.add(0);
+        List<Integer> rowXpos = new ArrayList<>();
+        rowXpos.add(0);
         for (int x = lpX; x < img.getWidth(); x++){
             int rgb = img.getRGB(x, lpY);
             if(rgb == -1){
-                X.add(x);
+                rowXpos.add(x);
             }
         }
         int cutIndex = 0;
-        for(int x = 1; x < X.size(); x++){
-            if (X.get(x) - X.get(x - 1) == 1){
+        for(int x = 1; x < rowXpos.size(); x++){
+            if (rowXpos.get(x) - rowXpos.get(x - 1) == 1){
                 cutIndex = x;
                 break;
             }
         }
-        return X.subList(0, cutIndex);
+        return rowXpos.subList(0, cutIndex);
     }
 
-    private int calcBottomLineY(BufferedImage img, List<Integer> Y){
+    private int calcBottomLineY(BufferedImage img, List<Integer> rowYpos){
 
         int columnLineX = 0;
-        int columnLineY = Y.get(0) + 1;
+        int columnLineY = rowYpos.get(0) + 1;
         int endOfY = 0;
         for(int x = 0; x < img.getWidth() ; x++){
             int rgb = img.getRGB(x,columnLineY);

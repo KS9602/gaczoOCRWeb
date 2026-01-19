@@ -16,6 +16,7 @@ public class DownloadService {
     }
 
     public S3Object downloadExcel(String fileName){
+        log.info("Pobieram plik z S3: {}", fileName);
         return s3Service.downloadFile(fileName);
     }
 }

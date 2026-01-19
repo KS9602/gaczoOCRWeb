@@ -1,7 +1,6 @@
 package org.example.clientsOCR;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,16 +22,13 @@ public abstract class BaseOCR <T extends Record> implements OCR<T> {
 
 
     protected BaseOCR() throws IOException {
-        this.log = LoggerFactory.getLogger(getClass());;
+        this.log = LoggerFactory.getLogger(getClass());
         this.invoiceNrPattern = provideInvoicePattern();
         this.labels = provideLabels();
         this.areaStripper = provideAreaStriper();
     }
 
-    public abstract List<T> getRows(PDDocument document, int pageIndex) throws IOException;
-    public abstract List<T> buildRowRecords(PDPage page, List<List<String>> regionNames) throws IOException;
-    public abstract List<String> provideLabels();
-    public abstract String provideInvoicePattern();
+
     public String getinvoiceNrPattern(){ return invoiceNrPattern;}
 
     @Override
@@ -49,7 +45,7 @@ public abstract class BaseOCR <T extends Record> implements OCR<T> {
     public List<T> processDocument (PDDocument document, double margin) throws IOException{
         this.setMarginRate(margin);
         int pageCount = document.getNumberOfPages();
-        log.info("Wykryto liczbe stron: " + pageCount);
+        log.info("Wykryto liczbe stron: {}", pageCount);
         List<T> rows = new ArrayList<>();
         for (int i = 0; i < pageCount; i++){
             rows.addAll(getRows(document, i));
@@ -60,12 +56,12 @@ public abstract class BaseOCR <T extends Record> implements OCR<T> {
     @Override
     public List<String> getLabels(){
         return labels;
-    };
+    }
 
     @Override
     public boolean checkRightPixelLine(BufferedImage img,int color, int y, int baseX){
         for(int i = 0; i <= 500; i += 50){
-            if(!(img.getRGB(baseX + 50,y) == color)){
+            if((img.getRGB(baseX + 50,y) != color)){
                 return false;
             }
         }

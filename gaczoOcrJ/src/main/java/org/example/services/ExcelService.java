@@ -1,7 +1,6 @@
 package org.example.services;
 
 import com.amazonaws.services.s3.model.S3Object;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.io.function.IOSupplier;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -28,35 +27,42 @@ public class ExcelService {
     private static final Logger log = LoggerFactory.getLogger(ExcelService.class);
     private final S3Service s3Service;
 
-    private final Map<String, IOSupplier<OCR<? extends Record>>> NipToName = new HashMap<>();
-    private final Map<String, IOSupplier<OCR<? extends Record>>> NipToNameCorrection = new HashMap<>();
+    private final Map<String, IOSupplier<OCR<? extends Record>>> nipToName = new HashMap<>();
+    private final Map<String, IOSupplier<OCR<? extends Record>>> nipToNameCorrection = new HashMap<>();
 
-    public ExcelService(S3Service s3Service) throws IOException {
+    public ExcelService(S3Service s3Service){
         this.s3Service = s3Service;
 
-        this.NipToName.put(NipConfig.nip("company.1.NIP"), Company1OCR::new);
-            this.NipToName.put(NipConfig.nip("company.2.NIP"), Company2OCR::new);
-            this.NipToName.put(NipConfig.nip("company.3.NIP"), Company3OCR::new);
-            this.NipToName.put(NipConfig.nip("company.4.NIP"), Company4OCR::new);
-            this.NipToName.put(NipConfig.nip("company.5.NIP"), Company5OCR::new);
+        this.nipToName.put(NipConfig.nip("company.1.NIP"), Company1OCR::new);
+            this.nipToName.put(NipConfig.nip("company.2.NIP"), Company2OCR::new);
+            this.nipToName.put(NipConfig.nip("company.3.NIP"), Company3OCR::new);
+            this.nipToName.put(NipConfig.nip("company.4.NIP"), Company4OCR::new);
+            this.nipToName.put(NipConfig.nip("company.5.NIP"), Company5OCR::new);
 
-            this.NipToNameCorrection.put(NipConfig.nip("company.3.K.NIP"), Company3KOCR::new);
+            this.nipToNameCorrection.put(NipConfig.nip("company.3.K.NIP"), Company3KOCR::new);
 
     }
 
     private OCR<?> getOCRClass(String PDFText) throws IOException {
-        for (String key : NipToNameCorrection.keySet()) {
-            if (PDFText.contains(key)) {
-                log.info("Znaleziono NIP: " + key);
-                if(PDFText.contains(NipToNameCorrection.get(key).get().getinvoiceNrPattern())){
-                    return NipToNameCorrection.get(key).get();
+        for (Map.Entry<String, IOSupplier<OCR<? extends Record>>> entry
+                : nipToNameCorrection.entrySet()) {
+            String key = entry.getKey();
+            IOSupplier<OCR<? extends Record>> ocr = entry.getValue();
+
+            if (PDFText.contains(key) && ocr != null) {
+                log.info("Znaleziono NIP:{}", key);
+                if(PDFText.contains(ocr.get().getinvoiceNrPattern())){
+                    return ocr.get();
                 }
             }
         }
-        for (String key : NipToName.keySet()) {
-            if (PDFText.contains(key)) {
-                log.info("Znaleziono NIP: " + key);
-                return NipToName.get(key).get();
+        for (Map.Entry<String, IOSupplier<OCR<? extends Record>>> entry
+                : nipToName.entrySet()) {
+            String key = entry.getKey();
+            IOSupplier<OCR<? extends Record>> ocr = entry.getValue();
+            if (PDFText.contains(key) && ocr != null) {
+                log.info("Znaleziono NIP:{}", key);
+                return ocr.get();
             }
         }
         return null;
@@ -70,13 +76,13 @@ public class ExcelService {
         return stripper.getText(document);
     }
 
-        public void generateExcel(String requestId, JsonNode filenames, String margin) throws JsonProcessingException {
+        public void generateExcel(String requestId, JsonNode filenames, String margin){
         Map<String, byte[]> excelFiles = new LinkedHashMap<>();
         for( int i = 0; i < filenames.size(); i++){
             String filename = filenames.get(i).asText();
             S3Object object = s3Service.downloadFile(filename);
             if(object == null){
-                log.warn("Nie znaleziono pliku z S3: " + filename);
+                log.warn("Nie znaleziono pliku z S3:{}", filename);
                 continue;
             }
 
@@ -85,7 +91,7 @@ public class ExcelService {
                  PDDocument document = PDDocument.load(inputStream)) {
                 String PDFText = getText(document);
                 OCR<?> ocr = getOCRClass(PDFText);
-                log.info("Wybrano klase OCR: " + ocr);
+                log.info("Wybrano klase OCR:{}", ocr);
                 if (ocr == null) {
                     log.warn("Nie znaleziono klasy OCR");
                     continue;
@@ -104,7 +110,7 @@ public class ExcelService {
     }
 
     public void zipFiles(Map<String, byte[]> excelFiles, String requestId) {
-        log.info("Rozpoczynam tworzenie zip dla requestId: " + requestId);
+        log.info("Rozpoczynam tworzenie zip dla requestId:{}", requestId);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              ZipOutputStream zos = new ZipOutputStream(baos)) {
 
@@ -168,7 +174,7 @@ public class ExcelService {
             }
 
             workbook.write(baos);
-            log.info("Koncze budowe excela: " + filename);
+            log.info("Koncze budowe excela:{}", filename);
             return baos.toByteArray();
         }
     }

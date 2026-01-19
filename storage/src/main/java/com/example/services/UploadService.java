@@ -21,11 +21,15 @@ public class UploadService {
     }
 
     public List<String> saveS3(MultipartFile[] files, String requestId) throws IOException{
-
+        log.info("Zapisuje pliki do S3 dla requesta: {}", requestId);
         List<String> filenames = new ArrayList<>();
         for (MultipartFile file : files) {
-            String filename = requestId + "_" + file.getOriginalFilename().replace("_","-");
-            s3Service.uploadFile(filename, file.getInputStream(), file.getSize());
+            if(file == null || file.isEmpty()){
+                continue;
+            }
+            String filename = file.getOriginalFilename() != null ? file.getOriginalFilename().replace("_","-") : UUID.randomUUID().toString();
+            String newFilename = requestId + "_" + filename;
+            s3Service.uploadFile(newFilename, file.getInputStream(), file.getSize());
             filenames.add(filename);
         }
         return filenames;

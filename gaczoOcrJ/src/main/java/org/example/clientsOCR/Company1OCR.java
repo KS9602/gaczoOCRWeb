@@ -16,7 +16,7 @@ import java.util.List;
 public class Company1OCR extends BaseOCR<Company1Row> {
 
 
-    private final int endX = 558;
+    private static final int X_POS_FIELD = 558;
     private final List<Integer> xParams = List.of(
             36,
             56,
@@ -57,7 +57,7 @@ public class Company1OCR extends BaseOCR<Company1Row> {
     @Override
     public List<Company1Row> getRows(PDDocument document, int pageIndex) throws IOException {
 
-        log.info("Procesuje strone : " + pageIndex);
+        log.info("Procesuje strone : {}", pageIndex);
 
         PDPage page = document.getPage(pageIndex);
         Company1LineDetector detector = new Company1LineDetector(page);
@@ -74,7 +74,7 @@ public class Company1OCR extends BaseOCR<Company1Row> {
                 String regionName = i + "-" + j;
                 int x = xParams.get(j);
                 int y = (int) (pageHeight - heights.get(i).getY());
-                int w = j != xParams.size() - 1 ? xParams.get(j + 1) - xParams.get(j) : endX - xParams.get(j);
+                int w = j != xParams.size() - 1 ? xParams.get(j + 1) - xParams.get(j) : X_POS_FIELD - xParams.get(j);
                 int h = ((int) heights.get(i).getY() - (int) heights.get(i - 1).getY()) * -1;
                 areaStripper.addRegion(
                         regionName,

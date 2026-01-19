@@ -1,6 +1,5 @@
 package com.example.kafka;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,7 @@ public class OcrListener {
     }
 
     @KafkaListener(topics = "${kafka.topics.ocr.download}", groupId = "${kafka.consumer.group-id}")
-    public void handleMessageOcrEnd(String message) throws JsonProcessingException {
+    public void handleMessageOcrEnd(String message){
         log.info("Wiadomosc: {}", message);
     }
 }
