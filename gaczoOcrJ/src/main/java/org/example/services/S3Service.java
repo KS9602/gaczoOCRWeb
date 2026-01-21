@@ -18,8 +18,9 @@ public class S3Service {
     @Value("${aws.s3.bucket.storage}")
     private String bucketName;
 
-    public S3Service(AmazonS3 amazonS3) {
+    public S3Service(AmazonS3 amazonS3, @Value("${aws.s3.bucket.storage}") String bucketName) {
         this.amazonS3 = amazonS3;
+        this.bucketName = bucketName;
     }
 
     public void uploadFile(String key, InputStream inputStream, long contentLength) {
