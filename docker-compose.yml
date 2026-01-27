@@ -7,6 +7,46 @@ networks:
     internal: false
 
 services:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.1
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: keycloak
+
+      KC_HOSTNAME: keycloak
+      KC_HOSTNAME_PORT: 9999
+      KC_HOSTNAME_STRICT: false
+      KC_PROXY: edge
+    ports:
+      - "9999:9999"
+    depends_on:
+      - postgres
+    command:
+    - start-dev
+    - --https-port=9999
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    networks:
+      - backend
+      - outbound
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     container_name: zookeeper
@@ -46,6 +86,17 @@ services:
       - ocr-service
 
 
+  api-gateway:
+    build: ./apiGateway
+    container_name: api-gateway
+    ports:
+      - "9998:9998"
+    networks:
+      - backend
+      - outbound
+    depends_on:
+      - keycloak
+
   ocr-service:
     build: ./gaczoOcrJ
     container_name: gaczoOcrJ
@@ -53,11 +104,13 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: ${AWS_REGION}
+      KEYCLOACK_SECRET: ${KEYCLOACK_SECRET_GACZOCRJ}
     networks:
       - backend
       - outbound
     depends_on:
       - kafka
+      - api-gateway
 
 
   storage:
@@ -67,11 +120,15 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: ${AWS_REGION}
+      KEYCLOACK_SECRET: ${KEYCLOACK_SECRET_STORAGE}
     networks:
       - backend
       - outbound
     depends_on:
       - kafka
+      - api-gateway
     
 
- 
+volumes:
+  keycloak_data:
+  postgres_data:

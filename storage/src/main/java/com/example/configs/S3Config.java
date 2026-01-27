@@ -1,4 +1,4 @@
-package com.example.config;
+package com.example.configs;
 
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;

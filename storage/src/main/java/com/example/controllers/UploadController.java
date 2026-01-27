@@ -33,6 +33,7 @@ public class UploadController {
         this.controllerUtils = controllerUtils;
     }
 
+//    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/invoice")
     public ResponseEntity<?> uploadPdf(@RequestParam("files")  MultipartFile[] files, @RequestParam("margin") String margin) {
         for (MultipartFile file : files) {

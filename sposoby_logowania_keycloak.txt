@@ -1,0 +1,98 @@
+1️⃣ Authorization Code Flow (redirect na Keycloak)
+
+„Klasyczne logowanie użytkownika”
+
+Jak działa (high-level):
+Front (SPA / web) redirectuje usera na stronę Keycloak
+User wpisuje login + hasło w Keycloak
+Keycloak redirectuje z powrotem do frontu z authorization_code
+Front (lub backend) wymienia code → access token + id token
+
+Cechy:
+✔️ Najbezpieczniejszy flow dla użytkowników
+✔️ Hasło nigdy nie trafia do aplikacji
+✔️ Pełne wsparcie MFA, SSO, social loginów
+❌ Wymaga redirectów (nie do CLI / batch)
+
+Kiedy używać:
+Aplikacje webowe
+SPA (React, Angular, Vue)
+Mobile
+
+
+
+
+2️⃣ Authorization Code + PKCE
+
+To jest TEN SAM flow co wyżej, tylko utwardzony
+
+Co dodaje PKCE?:
+code_verifier – losowy sekret w kliencie
+code_challenge – hash code_verifier
+
+Keycloak wydaje token tylko jeśli klient zna verifier
+
+Dlaczego to ważne
+
+Chroni przed:
+przechwyceniem authorization_code
+atakiem MITM
+Zastępuje client_secret
+
+Cechy
+✔️ OBOWIĄZKOWY dla SPA
+✔️ Bezpieczny nawet bez secretu
+❌ Trochę bardziej skomplikowany
+
+Kiedy używać
+SPA
+Mobile
+Public clients (bez secretu)
+
+📌 Dzisiaj:
+Authorization Code + PKCE to standard nr 1
+
+3️⃣ Authorization Code (Backend-for-Frontend)
+
+Front tylko redirectuje, backend robi tokeny
+
+Jak działa
+Front redirectuje usera na Keycloak
+Keycloak wraca z code → do backendu
+Backend wymienia code na tokeny
+Backend trzyma tokeny (session / cookie)
+
+Cechy
+
+✔️ Tokeny nigdy nie trafiają do JS
+✔️ Bardzo bezpieczne
+❌ Więcej infrastruktury
+
+Kiedy używać:
+Web klasy enterprise
+Wysokie wymagania bezpieczeństwa
+Aplikacje bankowe
+
+4️⃣ Client Credentials Flow
+
+Backend ↔ Backend (bez użytkownika)
+
+Jak działa
+Mikroserwis wysyła:
+client_id + client_secret
+
+
+Dostaje access_token
+Token reprezentuje aplikację, nie usera
+
+Cechy
+✔️ Proste
+✔️ Idealne do serwisów technicznych
+❌ Brak użytkownika (sub = clientId)
+
+Kiedy używać
+Mikroserwis → mikroserwis
+CRON, batch, worker
+Integracje systemowe
+
+📌 Bardzo często używane w Springu

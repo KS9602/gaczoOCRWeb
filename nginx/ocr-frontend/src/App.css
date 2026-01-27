@@ -8,6 +8,7 @@ body {
   background: #121212;
   color: #eee;
   font-family: Arial, sans-serif;
+  position: relative;
 }
 
 .container {
@@ -101,4 +102,104 @@ button:hover {
 .margin-value span {
   margin-left: 4px;
   color: #aaa;
+}
+
+/* Nowe style dla auth-bar i popupów */
+.auth-bar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  z-index: 100;
+}
+
+.login-form {
+  display: flex;
+  gap: 5px;
+}
+
+.login-form input {
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: #2a2a2a;
+  color: white;
+  width: 100px;
+}
+
+.small-btn {
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+  margin: 0 !important;
+}
+
+.small-btn.outline {
+  background: transparent;
+  border: 1px solid #2196f3;
+}
+
+.small-btn.logout {
+  background: #f44336;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup {
+  background: #1e1e1e;
+  padding: 30px;
+  border-radius: 12px;
+  width: 300px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.popup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.popup-form input {
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: #2a2a2a;
+  color: white;
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.cancel-btn {
+  background: #555;
+}
+
+.placeholder-content {
+  text-align: left;
+  margin: 20px 0;
+  color: #ccc;
+  font-size: 14px;
 }
